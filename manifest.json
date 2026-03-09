@@ -1,0 +1,14 @@
+{
+  "name": "Film Lab — Karanlık Oda Asistanı",
+  "short_name": "Film Lab",
+  "description": "Analog film geliştirme asistanı — süre, kimyasal, zamanlayıcı",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f2ee",
+  "theme_color": "#1a1612",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="tr" data-mode="normal">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<!-- PWA -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Film Lab">
+<meta name="application-name" content="Film Lab">
+<meta name="theme-color" content="#1a1612">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<title>Film Lab — Karanlık Oda Asistanı</title>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════
+   THEME VARIABLES
+═══════════════════════════════════ */
+:root {
+  --bg:        #f5f2ee;
+  --bg2:       #ede9e3;
+  --bg3:       #e2ddd6;
+  --surface:   #ffffff;
+  --border:    #d0c9bf;
+  --text:      #2a2420;
+  --text2:     #6b5e54;
+  --text3:     #9e8e82;
+  --accent:    #1a1612;
+  --accent2:   #3d3530;
+  --red:       #b83225;
+  --red2:      #8c241a;
+  --green:     #2a6b3a;
+  --blue:      #2a4a8c;
+  --amber:     #9a5c10;
+  --shadow:    0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+  --radius:    10px;
+  --radius-sm: 6px;
+}
+
+/* SAFELIGHT MODE */
+html[data-mode="safe"] {
+  --bg:       #0d0200;
+  --bg2:      #150300;
+  --bg3:      #1c0400;
+  --surface:  #1a0400;
+  --border:   #5a0e08;
+  --text:     #ff4422;
+  --text2:    #cc2211;
+  --text3:    #882208;
+  --accent:   #ff3311;
+  --accent2:  #cc2200;
+  --red:      #ff4422;
+  --red2:     #cc2211;
+  --green:    #aa2200;
+  --blue:     #881100;
+  --amber:    #cc3300;
+  --shadow:   0 1px 3px rgba(0,0,0,0.5);
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.4);
+}
+
+/* ═══════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Courier Prime', monospace;
+  min-height: 100vh;
+  transition: background 0.4s, color 0.4s;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════
+   LAYOUT
+═══════════════════════════════════ */
+.app {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 0 100px;
+}
+
+/* ═══════════════════════════════════
+   TOP BAR
+═══════════════════════════════════ */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.4s, border-color 0.4s;
+}
+
+.app-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  line-height: 1;
+}
+
+.app-title span {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  display: block;
+  color: var(--text3);
+  font-family: 'Courier Prime', monospace;
+  font-weight: 400;
+  margin-top: 1px;
+}
+
+/* SAFELIGHT BUTTON */
+.safe-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--bg2);
+  color: var(--text2);
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  -webkit-user-select: none;
+}
+
+.safe-btn:active { transform: scale(0.96); }
+
+.safe-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #888;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+html[data-mode="safe"] .safe-dot {
+  background: #ff3311;
+  box-shadow: 0 0 6px 2px rgba(255,51,17,0.7);
+  animation: dot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes dot-pulse {
+  0%,100% { box-shadow: 0 0 6px 2px rgba(255,51,17,0.7); }
+  50%      { box-shadow: 0 0 12px 4px rgba(255,51,17,0.9); }
+}
+
+html[data-mode="safe"] .safe-btn {
+  border-color: #5a0e08;
+  background: #1a0400;
+  color: #cc2211;
+}
+
+/* ═══════════════════════════════════
+   TABS
+═══════════════════════════════════ */
+.tabs {
+  display: flex;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  transition: background 0.4s, border-color 0.4s;
+}
+
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  flex: 1;
+  min-width: 80px;
+  padding: 12px 8px;
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  -webkit-user-select: none;
+}
+
+.tab.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+  background: var(--surface);
+}
+
+/* ═══════════════════════════════════
+   PAGES
+═══════════════════════════════════ */
+.page { display: none; padding: 16px; }
+.page.active { display: block; }
+
+/* ═══════════════════════════════════
+   CARD
+═══════════════════════════════════ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  transition: background 0.4s, border-color 0.4s;
+}
+
+.card-title {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ═══════════════════════════════════
+   FORM ELEMENTS
+═══════════════════════════════════ */
+.field { margin-bottom: 14px; }
+.field:last-child { margin-bottom: 0; }
+
+label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 6px;
+}
+
+select, input[type="number"] {
+  width: 100%;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  font-family: 'Courier Prime', monospace;
+  font-size: 15px;
+  padding: 11px 12px;
+  border-radius: var(--radius-sm);
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.2s, background 0.4s;
+  min-height: 44px;
+}
+
+select:focus, input[type="number"]:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+select option { background: var(--surface); }
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+/* ═══════════════════════════════════
+   TEMP INDICATOR
+═══════════════════════════════════ */
+.temp-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-top: 12px;
+  transition: background 0.4s, border-color 0.4s;
+}
+
+.temp-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 38px;
+  color: var(--text);
+  min-width: 80px;
+  line-height: 1;
+}
+
+.temp-right { flex: 1; }
+
+.temp-bar-bg {
+  height: 5px;
+  background: var(--bg3);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.temp-bar {
+  height: 100%;
+  background: linear-gradient(to right, #2a6b3a, #9a5c10, #b83225);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.temp-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: var(--text3);
+}
+
+.temp-status {
+  font-size: 11px;
+  margin-top: 5px;
+  letter-spacing: 0.08em;
+}
+
+/* ═══════════════════════════════════
+   PRIMARY BUTTON
+═══════════════════════════════════ */
+.btn-primary {
+  width: 100%;
+  padding: 15px;
+  background: var(--accent);
+  color: var(--surface);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  margin-top: 14px;
+  transition: background 0.2s, transform 0.1s;
+  min-height: 52px;
+}
+
+html[data-mode="safe"] .btn-primary {
+  background: #8c0000;
+  color: #ff4422;
+}
+
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-secondary {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text2);
+  border-radius: var(--radius-sm);
+  font-family: 'Courier Prime', monospace;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 44px;
+}
+
+.btn-secondary:active { background: var(--bg2); }
+
+/* ═══════════════════════════════════
+   RESULT — RECIPE
+═══════════════════════════════════ */
+#resultCard { display: none; }
+#resultCard.show { display: block; }
+
+.recipe-meta {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--text2);
+}
+
+.recipe-meta strong { color: var(--text); }
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+}
+
+.badge-push { background: rgba(184,50,37,0.1); color: var(--red); border: 1px solid rgba(184,50,37,0.25); }
+.badge-note { background: rgba(42,107,58,0.1); color: var(--green); border: 1px solid rgba(42,107,58,0.25); }
+.badge-warn { background: rgba(154,92,16,0.1); color: var(--amber); border: 1px solid rgba(154,92,16,0.25); }
+
+html[data-mode="safe"] .badge-push,
+html[data-mode="safe"] .badge-note,
+html[data-mode="safe"] .badge-warn {
+  background: rgba(255,50,20,0.1);
+  color: var(--red);
+  border-color: rgba(255,50,20,0.3);
+}
+
+/* ═══════════════════════════════════
+   STEP CARDS ROW
+═══════════════════════════════════ */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 14px 0 0;
+}
+
+.step-card {
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  -webkit-user-select: none;
+}
+
+.step-card.sel {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+}
+
+html[data-mode="safe"] .step-card.sel {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(255,50,20,0.15);
+}
+
+.step-card:active { transform: scale(0.97); }
+
+.sc-bar {
+  height: 3px;
+  border-radius: 2px;
+  margin-bottom: 8px;
+}
+
+.sc-dev  { background: var(--red); }
+.sc-stop { background: var(--amber); }
+.sc-fix  { background: var(--green); }
+.sc-wash { background: var(--blue); }
+
+html[data-mode="safe"] .sc-dev,
+html[data-mode="safe"] .sc-stop,
+html[data-mode="safe"] .sc-fix,
+html[data-mode="safe"] .sc-wash { background: var(--red2); }
+
+.sc-name {
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 5px;
+}
+
+.sc-time {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: var(--text);
+  line-height: 1;
+}
+
+.sc-time small { font-size: 11px; color: var(--text3); }
+
+/* ═══════════════════════════════════
+   TIMER
+═══════════════════════════════════ */
+.timer-wrap {
+  text-align: center;
+  padding: 10px 0 6px;
+}
+
+.timer-step-label {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 4px;
+}
+
+.timer-display {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 22vw, 96px);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--text);
+  transition: color 0.3s;
+}
+
+.timer-display.running { color: var(--red); }
+
+.timer-display.warning {
+  color: var(--red) !important;
+  animation: t-flash 0.5s ease-in-out infinite;
+}
+
+@keyframes t-flash {
+  0%,100% { opacity:1; }
+  50%      { opacity:0.5; }
+}
+
+.prog-bar {
+  height: 5px;
+  background: var(--bg3);
+  border-radius: 3px;
+  margin: 10px 0;
+  overflow: hidden;
+}
+
+.prog-fill {
+  height: 100%;
+  background: var(--red);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 1s linear;
+}
+
+.agit-alert {
+  display: none;
+  background: rgba(184,50,37,0.1);
+  border: 1.5px solid var(--red);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--red);
+  margin: 8px 0;
+  animation: agit-flash 0.8s ease-in-out infinite;
+}
+
+@keyframes agit-flash {
+  0%,100% { background: rgba(184,50,37,0.08); }
+  50%      { background: rgba(184,50,37,0.18); }
+}
+
+.timer-btns {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tbtn {
+  padding: 13px;
+  border-radius: var(--radius-sm);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 17px;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  transition: all 0.2s;
+  min-height: 48px;
+  -webkit-user-select: none;
+}
+
+.tbtn.start {
+  background: var(--accent);
+  color: var(--surface);
+  border-color: var(--accent);
+}
+
+html[data-mode="safe"] .tbtn.start {
+  background: #8c0000;
+  color: #ff4422;
+  border-color: #8c0000;
+}
+
+.tbtn:active { transform: scale(0.96); }
+
+/* ═══════════════════════════════════
+   AGITATION GUIDE
+═══════════════════════════════════ */
+.agit-table { width:100%; border-collapse:collapse; font-size:12px; }
+.agit-table td { padding: 9px 8px; border-bottom: 1px solid var(--border); vertical-align: top; line-height:1.5; color: var(--text2); }
+.agit-table td:first-child { font-weight:700; color:var(--text); width:30%; white-space:nowrap; }
+.agit-table tr:last-child td { border-bottom:none; }
+
+/* ═══════════════════════════════════
+   CHEMICAL CALCULATOR
+═══════════════════════════════════ */
+.chem-result {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-top: 14px;
+  transition: background 0.4s, border-color 0.4s;
+}
+
+.chem-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.chem-row:last-child { border-bottom: none; padding-bottom: 0; }
+.chem-row:first-child { padding-top: 0; }
+
+.chem-label {
+  font-size: 12px;
+  color: var(--text2);
+  letter-spacing: 0.08em;
+}
+
+.chem-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.chem-value small { font-size: 13px; color: var(--text3); font-family: 'Courier Prime', monospace; }
+
+.chem-total {
+  font-size: 11px;
+  color: var(--text3);
+  text-align: center;
+  margin-top: 10px;
+  letter-spacing: 0.1em;
+}
+
+.ratio-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.rp {
+  padding: 6px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  color: var(--text2);
+  background: transparent;
+  transition: all 0.2s;
+  -webkit-user-select: none;
+  font-family: 'Courier Prime', monospace;
+}
+
+.rp.active, .rp:active {
+  background: var(--accent);
+  color: var(--surface);
+  border-color: var(--accent);
+}
+
+html[data-mode="safe"] .rp.active {
+  background: #8c0000;
+  color: #ff4422;
+  border-color: #8c0000;
+}
+
+/* ═══════════════════════════════════
+   NOTES
+═══════════════════════════════════ */
+textarea {
+  width: 100%;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  font-family: 'Courier Prime', monospace;
+  font-size: 14px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  resize: none;
+  min-height: 120px;
+  line-height: 1.7;
+  transition: border-color 0.2s, background 0.4s;
+}
+
+textarea:focus { outline: none; border-color: var(--accent); }
+
+.save-ok {
+  text-align: center;
+  font-size: 11px;
+  color: var(--green);
+  letter-spacing: 0.3em;
+  display: none;
+  margin-top: 8px;
+}
+
+html[data-mode="safe"] .save-ok { color: var(--red); }
+
+/* ═══════════════════════════════════
+   FILM STRIP FOOTER
+═══════════════════════════════════ */
+.film-strip-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 32px;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  z-index: 100;
+}
+
+html[data-mode="safe"] .film-strip-bar { background: #2a0000; }
+
+.strip-inner {
+  display: flex;
+  gap: 18px;
+  padding: 0 10px;
+  animation: strip-scroll 10s linear infinite;
+  white-space: nowrap;
+  min-width: 200%;
+}
+
+@keyframes strip-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.sp {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.5);
+  flex-shrink: 0;
+}
+
+html[data-mode="safe"] .sp { border-color: #5a0000; }
+
+/* ═══════════════════════════════════
+   MISC
+═══════════════════════════════════ */
+.divider { height:1px; background:var(--border); margin: 14px 0; }
+.small-note { font-size: 11px; color: var(--text3); line-height: 1.6; margin-top: 8px; }
+
+/* Safe mode: filter all non-essential colors to red palette */
+html[data-mode="safe"] select,
+html[data-mode="safe"] input[type="number"],
+html[data-mode="safe"] textarea {
+  background: #150300;
+  border-color: #5a0e08;
+  color: #ff4422;
+}
+
+html[data-mode="safe"] .chem-result {
+  background: #150300;
+  border-color: #5a0e08;
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="app-title">
+    Film Lab
+    <span>Karanlık Oda Asistanı</span>
+  </div>
+  <button class="safe-btn" onclick="toggleSafe()" id="safeBtn">
+    <div class="safe-dot" id="safeDot"></div>
+    <span id="safeTxt">Safelight</span>
+  </button>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('develop', this)">Geliştirme</button>
+  <button class="tab" onclick="switchTab('timer', this)">Zamanlayıcı</button>
+  <button class="tab" onclick="switchTab('chemical', this)">Kimyasal</button>
+  <button class="tab" onclick="switchTab('agitation', this)">Agitasyon</button>
+  <button class="tab" onclick="switchTab('notes', this)">Notlar</button>
+</div>
+
+<div class="app">
+
+<!-- ═══════════════ PAGE: DEVELOP ═══════════════ -->
+<div class="page active" id="pg-develop">
+
+  <div class="card">
+    <div class="card-title">Film Seçimi</div>
+    <div class="field">
+      <label>Film</label>
+      <select id="film">
+        <optgroup label="─ Ilford ─">
+          <option value="hp5_400">Ilford HP5 Plus 400</option>
+          <option value="hp5_800">Ilford HP5 Plus — Push 800</option>
+          <option value="hp5_1600">Ilford HP5 Plus — Push 1600</option>
+          <option value="hp5_3200">Ilford HP5 Plus — Push 3200</option>
+          <option value="fp4_125">Ilford FP4 Plus 125</option>
+          <option value="fp4_64">Ilford FP4 Plus — Pull 64</option>
+          <option value="delta_100">Ilford Delta 100</option>
+          <option value="delta_400">Ilford Delta 400</option>
+          <option value="delta_400_800">Ilford Delta 400 — Push 800</option>
+          <option value="delta_3200">Ilford Delta 3200</option>
+          <option value="pan_f50">Ilford Pan F Plus 50</option>
+          <option value="sfx_200">Ilford SFX 200 (IR)</option>
+        </optgroup>
+        <optgroup label="─ Kodak ─">
+          <option value="trix_400">Kodak Tri-X 400</option>
+          <option value="trix_800">Kodak Tri-X — Push 800</option>
+          <option value="trix_1600">Kodak Tri-X — Push 1600</option>
+          <option value="tmax_100">Kodak T-Max 100</option>
+          <option value="tmax_400">Kodak T-Max 400</option>
+          <option value="tmax_3200">Kodak T-Max P3200</option>
+          <option value="double_x">Kodak Double-X 5222</option>
+        </optgroup>
+        <optgroup label="─ Fomapan ─">
+          <option value="foma_100">Fomapan 100 Classic</option>
+          <option value="foma_200">Fomapan 200 Creative</option>
+          <option value="foma_400">Fomapan 400 Action</option>
+          <option value="foma_400_800">Fomapan 400 — Push 800</option>
+        </optgroup>
+        <optgroup label="─ Agfa / Rollei ─">
+          <option value="apx_100">Agfa APX 100</option>
+          <option value="apx_400">Agfa APX 400</option>
+          <option value="rollei_rpx100">Rollei RPX 100</option>
+          <option value="rollei_rpx400">Rollei RPX 400</option>
+          <option value="rollei_retro80s">Rollei Retro 80S</option>
+          <option value="rollei_ir400">Rollei Infrared 400</option>
+        </optgroup>
+        <optgroup label="─ Kentmere / Adox ─">
+          <option value="kentmere_100">Kentmere Pan 100</option>
+          <option value="kentmere_400">Kentmere Pan 400</option>
+          <option value="adox_chs25">Adox CHS 25 ART</option>
+          <option value="adox_hr50">Adox HR-50</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Developer</label>
+      <select id="developer">
+        <optgroup label="─ Ilford ─">
+          <option value="ddx">DD-X (1+4)</option>
+          <option value="id11_11">ID-11 (1+1)</option>
+          <option value="id11_stok">ID-11 (Stok)</option>
+          <option value="ilfosol3_9">Ilfosol 3 (1+9)</option>
+          <option value="ilfosol3_14">Ilfosol 3 (1+14)</option>
+          <option value="microphen">Microphen (Stok)</option>
+          <option value="microphen_11">Microphen (1+1)</option>
+          <option value="perceptol">Perceptol (Stok)</option>
+        </optgroup>
+        <optgroup label="─ Kodak ─">
+          <option value="d76_11">D-76 (1+1)</option>
+          <option value="d76_stok">D-76 (Stok)</option>
+          <option value="hc110b">HC-110 Dilüsyon B (1+31)</option>
+          <option value="hc110h">HC-110 Dilüsyon H (1+63)</option>
+          <option value="xtol">XTOL (Stok)</option>
+          <option value="xtol_11">XTOL (1+1)</option>
+          <option value="tmax_dev">T-Max Developer (1+4)</option>
+        </optgroup>
+        <optgroup label="─ Rodinal / R09 ─">
+          <option value="rodinal_25">Rodinal (1+25)</option>
+          <option value="rodinal_50">Rodinal (1+50)</option>
+          <option value="rodinal_100">Rodinal Stand (1+100)</option>
+        </optgroup>
+        <optgroup label="─ Diğer ─">
+          <option value="pyrocat_hd">Pyrocat-HD (1+1+100)</option>
+          <option value="fomadon_lqn">Fomadon LQN (1+9)</option>
+          <option value="atomal49">Atomal 49 (Stok)</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="row3">
+      <div class="field">
+        <label>Sıcaklık °C</label>
+        <input type="number" id="temp" value="20" min="15" max="30" step="0.5" oninput="onTempChange()">
+      </div>
+      <div class="field">
+        <label>Format</label>
+        <select id="format">
+          <option value="35">35mm</option>
+          <option value="120">120 MF</option>
+          <option value="4x5">4×5 LF</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Agitasyon</label>
+        <select id="agitation">
+          <option value="ilk30">İlk 30sn + 3dk'da bir</option>
+          <option value="30s">Her 30sn</option>
+          <option value="60s">Her 60sn</option>
+          <option value="2min">Her 2dk</option>
+          <option value="stand">Stand</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="temp-row">
+      <div class="temp-num" id="tempNum">20°</div>
+      <div class="temp-right">
+        <div class="temp-bar-bg">
+          <div class="temp-bar" id="tempBar" style="width:33%"></div>
+        </div>
+        <div class="temp-bar-labels"><span>15°</span><span>20° ideal</span><span>30°</span></div>
+        <div class="temp-status" id="tempStatus" style="color:var(--green)">● İdeal sıcaklık</div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="calculate()">Süreleri Hesapla</button>
+  </div>
+
+  <!-- RESULT CARD -->
+  <div class="card" id="resultCard">
+    <div class="card-title">Reçete</div>
+    <div id="badgeBox"></div>
+    <div class="recipe-meta" id="recipeMeta"></div>
+    <div class="steps-grid" id="stepsGrid"></div>
+    <p class="small-note" style="margin-top:12px">Adıma tıkla → Zamanlayıcı sekmesinde başlat</p>
+  </div>
+
+</div><!-- /pg-develop -->
+
+<!-- ═══════════════ PAGE: TIMER ═══════════════ -->
+<div class="page" id="pg-timer">
+
+  <div class="card">
+    <div class="card-title">Aktif Reçete Adımları</div>
+    <div class="steps-grid" id="timerStepsGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text3);font-size:13px">
+        Önce Geliştirme sekmesinden hesaplama yapın
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="timer-wrap">
+      <div class="timer-step-label" id="timerStepLabel">— Adım Seçin —</div>
+      <div class="timer-display" id="timerDisplay">00:00</div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+    <div class="agit-alert" id="agitAlert">🔄 AGİTASYON — 4 KEZ ÇEVİR</div>
+    <div class="timer-btns">
+      <button class="tbtn start" onclick="timerStart()">▶ Başlat</button>
+      <button class="tbtn" onclick="timerPause()">⏸ Dur</button>
+      <button class="tbtn" onclick="timerReset()">↺ Sıfır</button>
+    </div>
+  </div>
+
+</div><!-- /pg-timer -->
+
+<!-- ═══════════════ PAGE: CHEMICAL ═══════════════ -->
+<div class="page" id="pg-chemical">
+
+  <div class="card">
+    <div class="card-title">Kimyasal Karışım Hesaplayıcısı</div>
+
+    <div class="field">
+      <label>Developer Seç</label>
+      <select id="chemDev" onchange="onChemDevChange()">
+        <option value="custom">Manuel Giriş</option>
+        <optgroup label="─ Ilford ─">
+          <option value="ddx|1+4">DD-X — 1+4</option>
+          <option value="id11|1+1">ID-11 — 1+1</option>
+          <option value="id11s|1+0">ID-11 — Stok</option>
+          <option value="ilfosol3|1+9">Ilfosol 3 — 1+9</option>
+          <option value="ilfosol3b|1+14">Ilfosol 3 — 1+14</option>
+          <option value="microphen|1+0">Microphen — Stok</option>
+          <option value="microphen11|1+1">Microphen — 1+1</option>
+          <option value="perceptol|1+0">Perceptol — Stok</option>
+        </optgroup>
+        <optgroup label="─ Kodak ─">
+          <option value="d76|1+1">D-76 — 1+1</option>
+          <option value="d76s|1+0">D-76 — Stok</option>
+          <option value="hc110b|1+31">HC-110 — Dilüsyon B (1+31)</option>
+          <option value="hc110h|1+63">HC-110 — Dilüsyon H (1+63)</option>
+          <option value="xtol|1+0">XTOL — Stok</option>
+          <option value="xtol11|1+1">XTOL — 1+1</option>
+          <option value="tmax_dev|1+4">T-Max Dev — 1+4</option>
+        </optgroup>
+        <optgroup label="─ Rodinal ─">
+          <option value="rod25|1+25">Rodinal — 1+25</option>
+          <option value="rod50|1+50">Rodinal — 1+50</option>
+          <option value="rod100|1+100">Rodinal — 1+100</option>
+        </optgroup>
+        <optgroup label="─ Diğer ─">
+          <option value="fomadon|1+9">Fomadon LQN — 1+9</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Dilüsyon Oranı (manuel)</label>
+      <div class="ratio-presets" id="ratioPresets">
+        <button class="rp" onclick="setRatio(1,0,this)">Stok (1+0)</button>
+        <button class="rp" onclick="setRatio(1,1,this)">1+1</button>
+        <button class="rp active" onclick="setRatio(1,4,this)">1+4</button>
+        <button class="rp" onclick="setRatio(1,9,this)">1+9</button>
+        <button class="rp" onclick="setRatio(1,14,this)">1+14</button>
+        <button class="rp" onclick="setRatio(1,24,this)">1+24</button>
+        <button class="rp" onclick="setRatio(1,25,this)">1+25</button>
+        <button class="rp" onclick="setRatio(1,31,this)">1+31</button>
+        <button class="rp" onclick="setRatio(1,50,this)">1+50</button>
+        <button class="rp" onclick="setRatio(1,63,this)">1+63</button>
+        <button class="rp" onclick="setRatio(1,100,this)">1+100</button>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label>Konsantre Kısım (A)</label>
+        <input type="number" id="ratioA" value="1" min="1" max="10" oninput="calcChem()">
+      </div>
+      <div class="field">
+        <label>Su Kısım (B)</label>
+        <input type="number" id="ratioB" value="4" min="0" max="200" oninput="calcChem()">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Tank Kapasitesi (ml)</label>
+      <div class="ratio-presets">
+        <button class="rp" onclick="setCapacity(270)">270ml</button>
+        <button class="rp active" onclick="setCapacity(500)">500ml</button>
+        <button class="rp" onclick="setCapacity(600)">600ml</button>
+        <button class="rp" onclick="setCapacity(1000)">1000ml</button>
+        <button class="rp" onclick="setCapacity(1200)">1200ml</button>
+      </div>
+      <input type="number" id="capacity" value="500" min="50" max="5000" step="10" oninput="calcChem()">
+    </div>
+
+    <!-- RESULT -->
+    <div class="chem-result" id="chemResult">
+      <div class="chem-row">
+        <div>
+          <div class="chem-label">Konsantre Developer</div>
+          <div class="chem-label" id="chemDevLabel" style="font-size:10px;margin-top:2px;color:var(--text3)"></div>
+        </div>
+        <div class="chem-value" id="chemConc">—<small> ml</small></div>
+      </div>
+      <div class="chem-row">
+        <div>
+          <div class="chem-label">Eklenecek Su</div>
+        </div>
+        <div class="chem-value" id="chemWater">—<small> ml</small></div>
+      </div>
+      <div class="chem-row">
+        <div>
+          <div class="chem-label">Toplam Çözelti</div>
+        </div>
+        <div class="chem-value" id="chemTotal">—<small> ml</small></div>
+      </div>
+      <div class="chem-total" id="chemNote"></div>
+    </div>
+
+  </div>
+
+  <!-- STOP & FIX -->
+  <div class="card">
+    <div class="card-title">Stop Bath & Fixer Hesabı</div>
+
+    <div class="field">
+      <label>Stop Bath Türü</label>
+      <select id="stopType" onchange="calcStop()">
+        <option value="ilford_1_19">Ilford Ilfostop (1+19)</option>
+        <option value="ilford_1_9">Ilford Ilfostop (1+9)</option>
+        <option value="water">Su (plain water)</option>
+        <option value="custom_stop">Manuel</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Fixer Türü</label>
+      <select id="fixType" onchange="calcFix()">
+        <option value="ilford_rapid_4">Ilford Rapid Fixer (1+4)</option>
+        <option value="ilford_rapid_9">Ilford Rapid Fixer (1+9)</option>
+        <option value="kodak_fix_2">Kodak Fixer (1+2)</option>
+        <option value="tf4">TF-4 Archival (1+4)</option>
+        <option value="custom_fix">Manuel</option>
+      </select>
+    </div>
+
+    <div class="row2">
+      <div class="chem-result" style="margin-top:0">
+        <div style="font-size:9px;letter-spacing:0.2em;color:var(--text3);margin-bottom:8px">STOP BATH</div>
+        <div class="chem-row" style="padding:6px 0"><div class="chem-label">Konsantre</div><div class="chem-value" id="stopConc">—<small>ml</small></div></div>
+        <div class="chem-row" style="padding:6px 0"><div class="chem-label">Su</div><div class="chem-value" id="stopWater">—<small>ml</small></div></div>
+      </div>
+      <div class="chem-result" style="margin-top:0">
+        <div style="font-size:9px;letter-spacing:0.2em;color:var(--text3);margin-bottom:8px">FİXER</div>
+        <div class="chem-row" style="padding:6px 0"><div class="chem-label">Konsantre</div><div class="chem-value" id="fixConc">—<small>ml</small></div></div>
+        <div class="chem-row" style="padding:6px 0"><div class="chem-label">Su</div><div class="chem-value" id="fixWater">—<small>ml</small></div></div>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /pg-chemical -->
+
+<!-- ═══════════════ PAGE: AGITATION ═══════════════ -->
+<div class="page" id="pg-agitation">
+
+  <div class="card">
+    <div class="card-title">Developer Agitasyon Rehberi</div>
+    <table class="agit-table">
+      <tr><td>İlk 30sn</td><td>Sürekli yumuşak çevirme. Hava kabarcıklarını dağıtmak için.</td></tr>
+      <tr><td>Ardından</td><td>Seçtiğin programa göre (30sn, 60sn veya 2dk'da bir 4 çevirme).</td></tr>
+      <tr><td>Çevirme</td><td>Dolu devir — tank'ı 180° çevir, bırak. 4 kez ≈ 10 saniye.</td></tr>
+      <tr><td>Stand</td><td>Başta 1 çevirme, sonra dokunma. Rodinal 1+100 için ideal.</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Stop Bath Agitasyonu</div>
+    <table class="agit-table">
+      <tr><td>Süre</td><td>Ilford Ilfostop: 10sn. Düz su: 30–60sn.</td></tr>
+      <tr><td>Agitasyon</td><td>Tüm süre boyunca sürekli çevirme.</td></tr>
+      <tr><td>Amaç</td><td>Developer'ı anında nötralize eder — karakter değişimi önlenir.</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Fixer Agitasyonu</div>
+    <table class="agit-table">
+      <tr><td>İlk 30sn</td><td>Sürekli çevirme.</td></tr>
+      <tr><td>Ardından</td><td>Her 30sn'de 4 çevirme.</td></tr>
+      <tr><td>T-Max / Delta</td><td>Normal süreyi %20 uzat, T-grain yapısı fixer'ı yavaş emer.</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Yıkama (Ilford Yöntemi)</div>
+    <table class="agit-table">
+      <tr><td>Adım 1</td><td>Tankı suyla doldur, 5 kez çevir. Boşalt.</td></tr>
+      <tr><td>Adım 2</td><td>Yeniden doldur, 10 kez çevir. Boşalt.</td></tr>
+      <tr><td>Adım 3</td><td>Yeniden doldur, 20 kez çevir. Boşalt. Bitti.</td></tr>
+      <tr><td>Alternatif</td><td>10 dakika sürekli akan soğuk su.</td></tr>
+      <tr><td>Photoflo</td><td>Son aşamada 1 damla — leke ve çizgiye karşı.</td></tr>
+    </table>
+  </div>
+
+</div><!-- /pg-agitation -->
+
+<!-- ═══════════════ PAGE: NOTES ═══════════════ -->
+<div class="page" id="pg-notes">
+
+  <div class="card">
+    <div class="card-title">Oturum Notları</div>
+    <div class="field">
+      <label>Film Rulosu / Tarih / Gözlemler</label>
+      <textarea id="notes" placeholder="Örn: Rulo #14 — HP5 @800 — DD-X 1+4 — 20°C — 12dk&#10;İstanbul sahil, gece. Kontrastı güzel, tane belirgin.&#10;&#10;Sonraki: Fixer süresini 5.5dk dene."></textarea>
+    </div>
+    <button class="btn-secondary" onclick="saveNotes()">Notları Kaydet</button>
+    <div class="save-ok" id="saveOk">✓ KAYDEDİLDİ</div>
+  </div>
+
+</div><!-- /pg-notes -->
+
+</div><!-- /app -->
+
+<!-- FILM STRIP -->
+<div class="film-strip-bar">
+  <div class="strip-inner" id="stripEl"></div>
+</div>
+
+<!-- ═══════════════════════════════════
+     SCRIPT
+═══════════════════════════════════ -->
+<script>
+// ─────────────────────────────────────────
+//  DATABASE
+// ─────────────────────────────────────────
+const DB = {
+  ddx: {
+    hp5_400:{t20:9,stop:1,fix:5,wash:10},hp5_800:{t20:12,stop:1,fix:5,wash:10,push:'+1 stop push'},
+    hp5_1600:{t20:17,stop:1,fix:5,wash:10,push:'+2 stop push — belirgin tane'},hp5_3200:{t20:24,stop:1,fix:5,wash:10,push:'+3 stop'},
+    fp4_125:{t20:8,stop:1,fix:5,wash:10},fp4_64:{t20:6,stop:1,fix:5,wash:10,push:'Pull işlemi'},
+    delta_100:{t20:8,stop:1,fix:5,wash:10,notes:'Yoğun dilüsyon önerilir'},delta_400:{t20:9,stop:1,fix:5,wash:10},
+    delta_400_800:{t20:12,stop:1,fix:5,wash:10,push:'+1 stop'},delta_3200:{t20:12,stop:1,fix:5,wash:10},
+    pan_f50:{t20:7,stop:1,fix:5,wash:10,notes:'Çok ince tane'},sfx_200:{t20:11,stop:1,fix:5,wash:10,notes:'IR filtre varsa +%20'},
+    trix_400:{t20:9,stop:1,fix:5,wash:10},trix_800:{t20:11.5,stop:1,fix:5,wash:10,push:'+1 stop'},
+    trix_1600:{t20:16,stop:1,fix:5,wash:10,push:'+2 stop'},
+    tmax_100:{t20:7,stop:1,fix:6,wash:10},tmax_400:{t20:8,stop:1,fix:6,wash:10},tmax_3200:{t20:11,stop:1,fix:6,wash:10},
+    double_x:{t20:8.5,stop:1,fix:5,wash:10,notes:'Sinema filmi — güzel orta ton'},
+    foma_100:{t20:10,stop:1,fix:5,wash:10},foma_200:{t20:10,stop:1,fix:5,wash:10},
+    foma_400:{t20:11,stop:1,fix:5,wash:10},foma_400_800:{t20:14,stop:1,fix:5,wash:10,push:'+1 stop'},
+    apx_100:{t20:8.5,stop:1,fix:5,wash:10},apx_400:{t20:9,stop:1,fix:5,wash:10},
+    rollei_rpx100:{t20:8,stop:1,fix:5,wash:10},rollei_rpx400:{t20:9,stop:1,fix:5,wash:10},
+    rollei_retro80s:{t20:10,stop:1,fix:5,wash:10},rollei_ir400:{t20:12,stop:1,fix:5,wash:10,notes:'Kızılötesi film'},
+    kentmere_100:{t20:8,stop:1,fix:5,wash:10},kentmere_400:{t20:9,stop:1,fix:5,wash:10},
+    adox_chs25:{t20:9,stop:1,fix:6,wash:10,notes:'Ultra ince tane'},adox_hr50:{t20:8,stop:1,fix:6,wash:10},
+  },
+  id11_11:{
+    hp5_400:{t20:11,stop:1,fix:5,wash:10},hp5_800:{t20:14,stop:1,fix:5,wash:10,push:'+1 stop'},
+    hp5_1600:{t20:20,stop:1,fix:5,wash:10,push:'+2 stop'},hp5_3200:{t20:28,stop:1,fix:5,wash:10,push:'+3 stop'},
+    fp4_125:{t20:11,stop:1,fix:5,wash:10},delta_100:{t20:9,stop:1,fix:5,wash:10},
+    delta_400:{t20:11,stop:1,fix:5,wash:10},delta_3200:{t20:14,stop:1,fix:5,wash:10},
+    pan_f50:{t20:8,stop:1,fix:5,wash:10},
+    trix_400:{t20:11,stop:1,fix:5,wash:10},trix_800:{t20:13,stop:1,fix:5,wash:10,push:'+1 stop'},
+    trix_1600:{t20:18,stop:1,fix:5,wash:10,push:'+2 stop'},
+    tmax_100:{t20:9,stop:1,fix:6,wash:10},tmax_400:{t20:10,stop:1,fix:6,wash:10},tmax_3200:{t20:14,stop:1,fix:6,wash:10},
+    foma_100:{t20:11,stop:1,fix:5,wash:10},foma_200:{t20:11,stop:1,fix:5,wash:10},foma_400:{t20:13,stop:1,fix:5,wash:10},
+    apx_100:{t20:10,stop:1,fix:5,wash:10},apx_400:{t20:11,stop:1,fix:5,wash:10},
+    rollei_rpx100:{t20:10,stop:1,fix:5,wash:10},rollei_rpx400:{t20:11,stop:1,fix:5,wash:10},
+    kentmere_100:{t20:9.5,stop:1,fix:5,wash:10},kentmere_400:{t20:11,stop:1,fix:5,wash:10},
+    adox_chs25:{t20:10,stop:1,fix:6,wash:10},double_x:{t20:10,stop:1,fix:5,wash:10},
+  },
+  id11_stok:{
+    hp5_400:{t20:8,stop:1,fix:5,wash:10},fp4_125:{t20:7.5,stop:1,fix:5,wash:10},
+    delta_100:{t20:7,stop:1,fix:5,wash:10},delta_400:{t20:8,stop:1,fix:5,wash:10},
+    pan_f50:{t20:6,stop:1,fix:5,wash:10},trix_400:{t20:7,stop:1,fix:5,wash:10},
+    tmax_100:{t20:6,stop:1,fix:6,wash:10},foma_100:{t20:8,stop:1,fix:5,wash:10},apx_100:{t20:8,stop:1,fix:5,wash:10},
+  },
+  ilfosol3_9:{
+    hp5_400:{t20:7.5,stop:1,fix:5,wash:10},hp5_800:{t20:10,stop:1,fix:5,wash:10,push:'+1 stop'},
+    fp4_125:{t20:7,stop:1,fix:5,wash:10},delta_100:{t20:7,stop:1,fix:5,wash:10},
+    delta_400:{t20:8,stop:1,fix:5,wash:10},pan_f50:{t20:5.5,stop:1,fix:5,wash:10},
+    trix_400:{t20:7,stop:1,fix:5,wash:10},tmax_100:{t20:6,stop:1,fix:6,wash:10},tmax_400:{t20:7,stop:1,fix:6,wash:10},
+    foma_100:{t20:7,stop:1,fix:5,wash:10},foma_400:{t20:9,stop:1,fix:5,wash:10},
+    apx_100:{t20:6.5,stop:1,fix:5,wash:10},apx_400:{t20:8,stop:1,fix:5,wash:10},
+    rollei_rpx100:{t20:6.5,stop:1,fix:5,wash:10},rollei_rpx400:{t20:8,stop:1,fix:5,wash:10},
+    kentmere_100:{t20:7,stop:1,fix:5,wash:10},kentmere_400:{t20:8,stop:1,fix:5,wash:10},
+  },
+  ilfosol3_14:{
+    hp5_400:{t20:10,stop:1,fix:5,wash:10},fp4_125:{t20:9,stop:1,fix:5,wash:10},
+    delta_400:{t20:11,stop:1,fix:5,wash:10},trix_400:{t20:9,stop:1,fix:5,wash:10},
+    foma_100:{t20:9,stop:1,fix:5,wash:10},apx_100:{t20:8.5,stop:1,fix:5,wash:10},
+  },
+  microphen:{
+    hp5_400:{t20:8,stop:1,fix:5,wash:10,notes:'Push için ideal'},
+    hp5_800:{t20:10,stop:1,fix:5,wash:10,push:'+1 stop — Microphen push ideal'},
+    hp5_1600:{t20:14,stop:1,fix:5,wash:10,push:'+2 stop'},hp5_3200:{t20:20,stop:1,fix:5,wash:10,push:'+3 stop'},
+    fp4_125:{t20:7.5,stop:1,fix:5,wash:10},
+    delta_100:{t20:7,stop:1,fix:5,wash:10},delta_400:{t20:7,stop:1,fix:5,wash:10},
+    delta_400_800:{t20:9,stop:1,fix:5,wash:10,push:'+1 stop'},delta_3200:{t20:9,stop:1,fix:5,wash:10},
+    pan_f50:{t20:6,stop:1,fix:5,wash:10},
+    trix_400:{t20:7,stop:1,fix:5,wash:10},trix_800:{t20:9,stop:1,fix:5,wash:10,push:'+1 stop'},
+    tmax_400:{t20:9,stop:1,fix:6,wash:10},foma_400:{t20:9,stop:1,fix:5,wash:10},apx_400:{t20:8,stop:1,fix:5,wash:10},
+  },
+  microphen_11:{
+    hp5_400:{t20:11,stop:1,fix:5,wash:10},hp5_800:{t20:14,stop:1,fix:5,wash:10,push:'+1 stop'},
+    fp4_125:{t20:10,stop:1,fix:5,wash:10},delta_400:{t20:10,stop:1,fix:5,wash:10},trix_400:{t20:10,stop:1,fix:5,wash:10},
+  },
+  perceptol:{
+    hp5_400:{t20:13,stop:1,fix:5,wash:10,notes:'Çok ince tane, düşük kontrast'},
+    fp4_125:{t20:10,stop:1,fix:5,wash:10},delta_100:{t20:11,stop:1,fix:5,wash:10},
+    pan_f50:{t20:9,stop:1,fix:5,wash:10,notes:'Olağanüstü ince tane'},
+    adox_chs25:{t20:11,stop:1,fix:6,wash:10},
+  },
+  d76_11:{
+    hp5_400:{t20:11,stop:1,fix:5,wash:10},hp5_800:{t20:13,stop:1,fix:5,wash:10,push:'+1 stop'},
+    hp5_1600:{t20:18,stop:1,fix:5,wash:10,push:'+2 stop'},
+    fp4_125:{t20:8,stop:1,fix:5,wash:10},delta_100:{t20:8.5,stop:1,fix:5,wash:10},delta_400:{t20:10,stop:1,fix:5,wash:10},
+    trix_400:{t20:9,stop:1,fix:5,wash:10},trix_800:{t20:11,stop:1,fix:5,wash:10,push:'+1 stop'},
+    trix_1600:{t20:14,stop:1,fix:5,wash:10,push:'+2 stop'},
+    tmax_100:{t20:8,stop:1,fix:6,wash:10},tmax_400:{t20:9,stop:1,fix:6,wash:10},double_x:{t20:9,stop:1,fix:5,wash:10},
+    foma_100:{t20:10,stop:1,fix:5,wash:10},foma_200:{t20:10.5,stop:1,fix:5,wash:10},foma_400:{t20:12,stop:1,fix:5,wash:10},
+    apx_100:{t20:9.5,stop:1,fix:5,wash:10},apx_400:{t20:11,stop:1,fix:5,wash:10},
+    rollei_rpx100:{t20:9,stop:1,fix:5,wash:10},rollei_rpx400:{t20:11,stop:1,fix:5,wash:10},
+    kentmere_100:{t20:9,stop:1,fix:5,wash:10},kentmere_400:{t20:11,stop:1,fix:5,wash:10},
+  },
+  d76_stok:{
+    hp5_400:{t20:7.5,stop:1,fix:5,wash:10},fp4_125:{t20:6,stop:1,fix:5,wash:10},
+    trix_400:{t20:7,stop:1,fix:5,wash:10},tmax_100:{t20:6,stop:1,fix:6,wash:10},tmax_400:{t20:6.5,stop:1,fix:6,wash:10},
+    foma_100:{t20:7.5,stop:1,fix:5,wash:10},apx_100:{t20:7,stop:1,fix:5,wash:10},adox_chs25:{t20:8,stop:1,fix:6,wash:10},
+  },
+  hc110b:{
+    hp5_400:{t20:6,stop:1,fix:5,wash:10},hp5_800:{t20:8,stop:1,fix:5,wash:10,push:'+1 stop'},
+    fp4_125:{t20:5,stop:1,fix:5,wash:10},delta_100:{t20:5.5,stop:1,fix:5,wash:10},delta_400:{t20:6.5,stop:1,fix:5,wash:10},
+    trix_400:{t20:5.5,stop:1,fix:5,wash:10},trix_800:{t20:7,stop:1,fix:5,wash:10,push:'+1 stop'},
+    tmax_100:{t20:5,stop:1,fix:6,wash:10},tmax_400:{t20:5.5,stop:1,fix:6,wash:10},
+    double_x:{t20:6,stop:1,fix:5,wash:10},
+    foma_100:{t20:6,stop:1,fix:5,wash:10},foma_400:{t20:7,stop:1,fix:5,wash:10},
+    apx_100:{t20:5.5,stop:1,fix:5,wash:10},rollei_rpx400:{t20:6.5,stop:1,fix:5,wash:10},
+  },
+  hc110h:{
+    hp5_400:{t20:11,stop:1,fix:5,wash:10,notes:'Uzun süre, ince tane'},
+    trix_400:{t20:10,stop:1,fix:5,wash:10},foma_100:{t20:12,stop:1,fix:5,wash:10},
+  },
+  xtol:{
+    hp5_400:{t20:9,stop:1,fix:5,wash:10},hp5_800:{t20:11,stop:1,fix:5,wash:10,push:'+1 stop'},
+    fp4_125:{t20:8,stop:1,fix:5,wash:10},delta_100:{t20:7.5,stop:1,fix:5,wash:10},delta_400:{t20:8,stop:1,fix:5,wash:10},
+    trix_400:{t20:7.5,stop:1,fix:5,wash:10},
+    tmax_100:{t20:5,stop:1,fix:6,wash:10,notes:'T-Max için ideal'},
+    tmax_400:{t20:6,stop:1,fix:6,wash:10},tmax_3200:{t20:8,stop:1,fix:6,wash:10},
+    double_x:{t20:8,stop:1,fix:5,wash:10},foma_100:{t20:9,stop:1,fix:5,wash:10},
+    apx_100:{t20:8,stop:1,fix:5,wash:10},rollei_rpx100:{t20:8,stop:1,fix:5,wash:10},
+    adox_chs25:{t20:9,stop:1,fix:6,wash:10},
+  },
+  xtol_11:{
+    hp5_400:{t20:12,stop:1,fix:5,wash:10},trix_400:{t20:10,stop:1,fix:5,wash:10},
+    tmax_100:{t20:7,stop:1,fix:6,wash:10},tmax_400:{t20:8,stop:1,fix:6,wash:10},delta_400:{t20:11,stop:1,fix:5,wash:10},
+  },
+  tmax_dev:{
+    tmax_100:{t20:5,stop:1,fix:6,wash:10,notes:'Kodak resmi önerisi'},
+    tmax_400:{t20:6,stop:1,fix:6,wash:10},tmax_3200:{t20:7,stop:1,fix:6,wash:10},
+    hp5_400:{t20:7,stop:1,fix:5,wash:10},trix_400:{t20:6,stop:1,fix:5,wash:10},delta_400:{t20:7,stop:1,fix:5,wash:10},
+  },
+  rodinal_25:{
+    hp5_400:{t20:8,stop:1,fix:5,wash:10,notes:'Belirgin tane, yüksek kontrast'},
+    fp4_125:{t20:7,stop:1,fix:5,wash:10},delta_400:{t20:9,stop:1,fix:5,wash:10},pan_f50:{t20:6,stop:1,fix:5,wash:10},
+    trix_400:{t20:7,stop:1,fix:5,wash:10},
+    foma_100:{t20:9,stop:1,fix:5,wash:10},foma_400:{t20:11,stop:1,fix:5,wash:10},
+    apx_100:{t20:8,stop:1,fix:5,wash:10,notes:'APX 100 + Rodinal klasik'},apx_400:{t20:10,stop:1,fix:5,wash:10},
+    rollei_rpx100:{t20:7,stop:1,fix:5,wash:10},rollei_rpx400:{t20:8,stop:1,fix:5,wash:10},
+    rollei_retro80s:{t20:8,stop:1,fix:5,wash:10},kentmere_100:{t20:8,stop:1,fix:5,wash:10},
+    adox_chs25:{t20:10,stop:1,fix:6,wash:10},double_x:{t20:7.5,stop:1,fix:5,wash:10},
+  },
+  rodinal_50:{
+    hp5_400:{t20:13,stop:1,fix:5,wash:10},fp4_125:{t20:11,stop:1,fix:5,wash:10},
+    delta_400:{t20:14,stop:1,fix:5,wash:10},pan_f50:{t20:9,stop:1,fix:5,wash:10},
+    trix_400:{t20:11,stop:1,fix:5,wash:10},
+    foma_100:{t20:14,stop:1,fix:5,wash:10},foma_400:{t20:17,stop:1,fix:5,wash:10},
+    apx_100:{t20:13,stop:1,fix:5,wash:10},apx_400:{t20:15,stop:1,fix:5,wash:10},
+    rollei_rpx100:{t20:12,stop:1,fix:5,wash:10},rollei_rpx400:{t20:13,stop:1,fix:5,wash:10},
+    adox_chs25:{t20:15,stop:1,fix:6,wash:10},
+  },
+  rodinal_100:{
+    hp5_400:{t20:60,stop:1,fix:5,wash:10,notes:'Stand — 1 saat, yalnız başta çevir'},
+    fp4_125:{t20:60,stop:1,fix:5,wash:10,notes:'Stand 1 saat'},
+    trix_400:{t20:60,stop:1,fix:5,wash:10,notes:'Stand — efsane kombo'},
+    foma_100:{t20:60,stop:1,fix:5,wash:10,notes:'Stand 1 saat'},
+    foma_400:{t20:60,stop:1,fix:5,wash:10,notes:'Stand 1 saat'},
+    apx_100:{t20:60,stop:1,fix:5,wash:10,notes:'Stand — APX100 + Rodinal klasik'},
+    delta_400:{t20:60,stop:1,fix:5,wash:10,notes:'Stand — crossing dikkat'},
+  },
+  pyrocat_hd:{
+    hp5_400:{t20:11,stop:1,fix:8,wash:15,notes:'Staining developer. Amonyum thiosulfate kullan'},
+    fp4_125:{t20:9,stop:1,fix:8,wash:15,notes:'Staining'},
+    trix_400:{t20:10,stop:1,fix:8,wash:15,notes:'Staining'},
+    tmax_100:{t20:8,stop:1,fix:8,wash:15},
+    foma_100:{t20:10,stop:1,fix:8,wash:15},apx_100:{t20:9,stop:1,fix:8,wash:15},adox_chs25:{t20:10,stop:1,fix:8,wash:15},
+  },
+  fomadon_lqn:{
+    foma_100:{t20:7,stop:1,fix:5,wash:10,notes:'Foma önerilen developer'},
+    foma_200:{t20:7.5,stop:1,fix:5,wash:10},foma_400:{t20:8,stop:1,fix:5,wash:10},
+    foma_400_800:{t20:11,stop:1,fix:5,wash:10,push:'+1 stop'},
+    hp5_400:{t20:9,stop:1,fix:5,wash:10},apx_100:{t20:8,stop:1,fix:5,wash:10},
+  },
+  atomal49:{
+    hp5_400:{t20:10,stop:1,fix:5,wash:10,notes:'İnce tane, yüksek hız'},
+    delta_400:{t20:9,stop:1,fix:5,wash:10},delta_3200:{t20:12,stop:1,fix:5,wash:10},
+    tmax_400:{t20:8,stop:1,fix:6,wash:10},tmax_3200:{t20:11,stop:1,fix:6,wash:10},fp4_125:{t20:9,stop:1,fix:5,wash:10},
+  },
+};
+
+const DEV_LABELS = {
+  ddx:'DD-X (1+4)',id11_11:'ID-11 (1+1)',id11_stok:'ID-11 Stok',
+  ilfosol3_9:'Ilfosol 3 (1+9)',ilfosol3_14:'Ilfosol 3 (1+14)',
+  microphen:'Microphen Stok',microphen_11:'Microphen (1+1)',perceptol:'Perceptol Stok',
+  d76_11:'D-76 (1+1)',d76_stok:'D-76 Stok',hc110b:'HC-110 Dil.B',hc110h:'HC-110 Dil.H',
+  xtol:'XTOL Stok',xtol_11:'XTOL (1+1)',tmax_dev:'T-Max Dev (1+4)',
+  rodinal_25:'Rodinal 1+25',rodinal_50:'Rodinal 1+50',rodinal_100:'Rodinal Stand',
+  pyrocat_hd:'Pyrocat-HD',fomadon_lqn:'Fomadon LQN',atomal49:'Atomal 49',
+};
+
+// ─────────────────────────────────────────
+//  SAFELIGHT
+// ─────────────────────────────────────────
+let safeMode = false;
+
+function toggleSafe() {
+  safeMode = !safeMode;
+  document.documentElement.setAttribute('data-mode', safeMode ? 'safe' : 'normal');
+  document.getElementById('safeTxt').textContent = safeMode ? 'Normal Mod' : 'Safelight';
+}
+
+// ─────────────────────────────────────────
+//  TABS
+// ─────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('pg-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─────────────────────────────────────────
+//  TEMP
+// ─────────────────────────────────────────
+function onTempChange() {
+  const t = parseFloat(document.getElementById('temp').value) || 20;
+  document.getElementById('tempNum').textContent = t.toFixed(1) + '°';
+  const pct = ((t - 15) / 15) * 100;
+  document.getElementById('tempBar').style.width = Math.min(100, Math.max(0, pct)) + '%';
+  const st = document.getElementById('tempStatus');
+  if (t < 17)       { st.textContent = '● Soğuk — süre uzar'; st.style.color = 'var(--blue)'; }
+  else if (t <= 21) { st.textContent = '● İdeal sıcaklık'; st.style.color = 'var(--green)'; }
+  else if (t <= 24) { st.textContent = '● Ilık — süre kısalır'; st.style.color = 'var(--amber)'; }
+  else              { st.textContent = '● Çok sıcak — dikkat!'; st.style.color = 'var(--red)'; }
+}
+
+function tempCorrect(base, t) { return base * Math.pow(1.10, 20 - t); }
+
+// ─────────────────────────────────────────
+//  CALCULATE
+// ─────────────────────────────────────────
+let currentSteps = [];
+let activeStepIdx = 0;
+
+function calculate() {
+  const film = document.getElementById('film').value;
+  const dev  = document.getElementById('developer').value;
+  const temp = parseFloat(document.getElementById('temp').value);
+  const data = DB[dev]?.[film];
+
+  let devTime, stop, fix, wash, badge = null, badgeClass = '', estimated = false;
+
+  if (data) {
+    devTime = tempCorrect(data.t20, temp);
+    stop = data.stop; fix = data.fix; wash = data.wash;
+    if (data.push)  { badge = '📌 ' + data.push; badgeClass = 'badge-push'; }
+    else if (data.notes) { badge = '💡 ' + data.notes; badgeClass = 'badge-note'; }
+  } else {
+    devTime = tempCorrect(10, temp); stop=1; fix=5; wash=10; estimated=true;
+    badge = '⚠ Kesin veri yok — tahmin'; badgeClass = 'badge-warn';
+  }
+
+  currentSteps = [
+    {name:'Developer', mins:devTime, type:'dev',  note:'Agit. planına göre'},
+    {name:'Stop Bath',  mins:stop,   type:'stop', note:'Sürekli çevirme'},
+    {name:'Fixer',      mins:fix,    type:'fix',  note:'Her 30sn 4 çevir'},
+    {name:'Yıkama',     mins:wash,   type:'wash', note:'Akan su'},
+  ];
+
+  const filmLabel = document.querySelector('#film option:checked').text;
+  const devLabel  = DEV_LABELS[dev] || dev;
+  const total = (devTime + stop + fix + wash).toFixed(1);
+
+  const bb = document.getElementById('badgeBox');
+  bb.innerHTML = badge ? `<div class="badge ${badgeClass}">${badge}</div>` : '';
+
+  document.getElementById('recipeMeta').innerHTML =
+    `<strong>${filmLabel}</strong> × <strong>${devLabel}</strong><br>
+     Sıcaklık: <strong>${temp}°C</strong> &nbsp;·&nbsp;
+     Developer: <strong>${devTime.toFixed(2)} dk</strong> &nbsp;·&nbsp;
+     Toplam: <strong>${total} dk</strong>`;
+
+  buildStepCards('stepsGrid', true);
+  buildStepCards('timerStepsGrid', false);
+
+  document.getElementById('resultCard').classList.add('show');
+
+  // Update timer for first step
+  activeStepIdx = 0;
+  updateTimerStep();
+}
+
+function buildStepCards(gridId, clickable) {
+  const grid = document.getElementById(gridId);
+  grid.innerHTML = '';
+  currentSteps.forEach((s, i) => {
+    const m = Math.floor(s.mins), sec = Math.round((s.mins - m) * 60);
+    const timeStr = sec > 0
+      ? `${m}<small>dk</small>${String(sec).padStart(2,'0')}<small>sn</small>`
+      : `${m}<small>dk</small>`;
+    const clickAttr = clickable ? `onclick="selectStepAndTimer(${i})"` : `onclick="selectTimerStep(${i})"`;
+    grid.innerHTML += `
+      <div class="step-card ${i===0?'sel':''} ${gridId}-card" id="${gridId}-sc-${i}" ${clickAttr}>
+        <div class="sc-bar sc-${s.type}"></div>
+        <div class="sc-name">${s.name}</div>
+        <div class="sc-time">${timeStr}</div>
+      </div>`;
+  });
+}
+
+function selectStepAndTimer(i) {
+  activeStepIdx = i;
+  updateStepCardHighlight('stepsGrid', i);
+  updateTimerStep();
+  // Switch to timer tab
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('pg-timer').classList.add('active');
+  document.querySelectorAll('.tab')[1].classList.add('active');
+}
+
+function selectTimerStep(i) {
+  activeStepIdx = i;
+  updateStepCardHighlight('timerStepsGrid', i);
+  updateTimerStep();
+  timerPause();
+  timerReset();
+}
+
+function updateStepCardHighlight(gridId, idx) {
+  document.querySelectorAll(`#${gridId} .step-card`).forEach((c,j) => c.classList.toggle('sel', j===idx));
+}
+
+// ─────────────────────────────────────────
+//  TIMER
+// ─────────────────────────────────────────
+let timerSecs = 0, timerTotal = 0, timerRunning = false, timerInt = null;
+let lastAgitSecs = 0;
+const AudioCtx = typeof AudioContext !== 'undefined' ? new AudioContext() : null;
+
+function beep(freq=880, dur=0.15, vol=0.25) {
+  if (!AudioCtx) return;
+  AudioCtx.resume();
+  const o = AudioCtx.createOscillator(), g = AudioCtx.createGain();
+  o.connect(g); g.connect(AudioCtx.destination);
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(vol, AudioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, AudioCtx.currentTime + dur);
+  o.start(); o.stop(AudioCtx.currentTime + dur);
+}
+
+function updateTimerStep() {
+  if (!currentSteps.length) return;
+  const s = currentSteps[activeStepIdx];
+  timerSecs = Math.round(s.mins * 60);
+  timerTotal = timerSecs;
+  timerRunning = false;
+  clearInterval(timerInt);
+  lastAgitSecs = timerSecs;
+  document.getElementById('agitAlert').style.display = 'none';
+  document.getElementById('timerStepLabel').textContent = s.name.toUpperCase();
+  updateTimerDisplay();
+  updateStepCardHighlight('timerStepsGrid', activeStepIdx);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSecs / 60), s = timerSecs % 60;
+  const disp = document.getElementById('timerDisplay');
+  disp.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  const pct = timerTotal > 0 ? ((timerTotal - timerSecs) / timerTotal * 100) : 0;
+  document.getElementById('progFill').style.width = pct + '%';
+  if (timerSecs <= 10 && timerSecs > 0 && timerRunning) disp.className = 'timer-display warning';
+  else if (timerRunning) disp.className = 'timer-display running';
+  else disp.className = 'timer-display';
+}
+
+function timerStart() {
+  if (timerRunning || timerSecs <= 0) return;
+  timerRunning = true;
+  const agit = document.getElementById('agitation').value;
+  const agitInterval = agit==='30s'?30 : agit==='60s'?60 : agit==='2min'?120 : agit==='ilk30'?30 : 9999;
+  lastAgitSecs = timerSecs;
+
+  timerInt = setInterval(() => {
+    timerSecs--;
+    updateTimerDisplay();
+
+    // agitation
+    if (activeStepIdx === 0 && agit !== 'stand') {
+      if ((lastAgitSecs - timerSecs) >= agitInterval) {
+        lastAgitSecs = timerSecs;
+        triggerAgit();
+      }
+    }
+
+    if (timerSecs <= 5 && timerSecs > 0) beep(550, 0.08, 0.18);
+    if (timerSecs <= 0) {
+      clearInterval(timerInt); timerRunning = false;
+      beep(880,0.2); setTimeout(()=>beep(1100,0.3),280); setTimeout(()=>beep(1320,0.35),560);
+      document.getElementById('timerStepLabel').textContent = '✓ TAMAMLANDI';
+      document.getElementById('agitAlert').style.display = 'none';
+      document.getElementById('timerDisplay').className = 'timer-display';
+    }
+  }, 1000);
+}
+
+function triggerAgit() {
+  const a = document.getElementById('agitAlert');
+  a.style.display = 'block';
+  beep(440,0.07,0.18); setTimeout(()=>beep(440,0.07,0.18),150);
+  setTimeout(()=>{ a.style.display='none'; }, 5000);
+}
+
+function timerPause() { timerRunning=false; clearInterval(timerInt); updateTimerDisplay(); }
+function timerReset() {
+  timerPause();
+  if (currentSteps.length) { timerSecs=Math.round(currentSteps[activeStepIdx].mins*60); timerTotal=timerSecs; }
+  document.getElementById('progFill').style.width='0%';
+  document.getElementById('agitAlert').style.display='none';
+  document.getElementById('timerStepLabel').textContent = currentSteps[activeStepIdx]?.name.toUpperCase() || '—';
+  updateTimerDisplay();
+}
+
+// ─────────────────────────────────────────
+//  CHEMICAL CALCULATOR
+// ─────────────────────────────────────────
+let ratioA = 1, ratioB = 4;
+
+function setRatio(a, b, btn) {
+  ratioA = a; ratioB = b;
+  document.getElementById('ratioA').value = a;
+  document.getElementById('ratioB').value = b;
+  document.querySelectorAll('.rp').forEach(r => r.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  calcChem();
+}
+
+function setCapacity(val) {
+  document.getElementById('capacity').value = val;
+  document.querySelectorAll('#pg-chemical .card:first-child .rp').forEach(r => r.classList.remove('active'));
+  const btns = document.querySelectorAll('#pg-chemical .card:first-child .ratio-presets');
+  if (btns[1]) {
+    btns[1].querySelectorAll('.rp').forEach(r => {
+      if (parseInt(r.textContent) === val) r.classList.add('active');
+    });
+  }
+  calcChem();
+}
+
+function onChemDevChange() {
+  const val = document.getElementById('chemDev').value;
+  if (val === 'custom') return;
+  const parts = val.split('|');
+  const ratioStr = parts[1] || '1+4';
+  const rParts = ratioStr.split('+');
+  const a = parseInt(rParts[0]) || 1;
+  const b = parseInt(rParts[1]) || 0;
+  ratioA = a; ratioB = b;
+  document.getElementById('ratioA').value = a;
+  document.getElementById('ratioB').value = b;
+  document.querySelectorAll('.rp').forEach(r => r.classList.remove('active'));
+  document.getElementById('chemDevLabel').textContent = parts[0] || '';
+  calcChem();
+}
+
+function calcChem() {
+  ratioA = parseInt(document.getElementById('ratioA').value) || 1;
+  ratioB = parseInt(document.getElementById('ratioB').value) || 0;
+  const cap = parseFloat(document.getElementById('capacity').value) || 500;
+  const total = ratioA + ratioB;
+  const conc = Math.round((cap / total) * ratioA);
+  const water = cap - conc;
+  document.getElementById('chemConc').innerHTML = `${conc}<small> ml</small>`;
+  document.getElementById('chemWater').innerHTML = `${water}<small> ml</small>`;
+  document.getElementById('chemTotal').innerHTML = `${cap}<small> ml</small>`;
+  const note = ratioB === 0
+    ? 'Stok çözelti — seyreltme yok'
+    : `${ratioA}+${ratioB} dilüsyonu — ${cap}ml için`;
+  document.getElementById('chemNote').textContent = note;
+
+  // Also update stop & fix
+  calcStop(); calcFix();
+}
+
+const STOP_RATIOS = {
+  ilford_1_19: [1,19], ilford_1_9: [1,9], water: [0,1], custom_stop: null
+};
+const FIX_RATIOS = {
+  ilford_rapid_4:[1,4], ilford_rapid_9:[1,9], kodak_fix_2:[1,2], tf4:[1,4], custom_fix:null
+};
+
+function calcStop() {
+  const cap = parseFloat(document.getElementById('capacity').value) || 500;
+  const stopKey = document.getElementById('stopType').value;
+  const r = STOP_RATIOS[stopKey];
+  if (!r) return;
+  if (r[0] === 0) {
+    document.getElementById('stopConc').innerHTML = `0<small>ml</small>`;
+    document.getElementById('stopWater').innerHTML = `${cap}<small>ml</small>`;
+  } else {
+    const total = r[0]+r[1];
+    const conc = Math.round(cap/total*r[0]);
+    document.getElementById('stopConc').innerHTML = `${conc}<small>ml</small>`;
+    document.getElementById('stopWater').innerHTML = `${cap-conc}<small>ml</small>`;
+  }
+}
+
+function calcFix() {
+  const cap = parseFloat(document.getElementById('capacity').value) || 500;
+  const fixKey = document.getElementById('fixType').value;
+  const r = FIX_RATIOS[fixKey];
+  if (!r) return;
+  const total = r[0]+r[1];
+  const conc = Math.round(cap/total*r[0]);
+  document.getElementById('fixConc').innerHTML = `${conc}<small>ml</small>`;
+  document.getElementById('fixWater').innerHTML = `${cap-conc}<small>ml</small>`;
+}
+
+// ─────────────────────────────────────────
+//  NOTES
+// ─────────────────────────────────────────
+function saveNotes() {
+  try { localStorage.setItem('darkroom_notes_v2', document.getElementById('notes').value); } catch(e){}
+  const ok = document.getElementById('saveOk');
+  ok.style.display = 'block';
+  setTimeout(() => ok.style.display='none', 2500);
+}
+
+try {
+  const n = localStorage.getItem('darkroom_notes_v2');
+  if (n) document.getElementById('notes').value = n;
+} catch(e){}
+
+// ─────────────────────────────────────────
+//  FILM STRIP
+// ─────────────────────────────────────────
+const stripEl = document.getElementById('stripEl');
+let sh = '';
+for (let i=0; i<80; i++) sh += '<div class="sp"></div>';
+stripEl.innerHTML = sh + sh;
+
+// INIT
+onTempChange();
+calcChem();
+
+// ── SERVICE WORKER ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
