@@ -3,18 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-
-<!-- PWA -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="screen-orientation" content="portrait">
+<style>
+  html, body { height: 100%; overflow-x: hidden; }
+  /* Notch / status bar için güvenli alan */
+  body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+</style>
 <meta name="apple-mobile-web-app-title" content="Film Lab">
-<meta name="application-name" content="Film Lab">
 <meta name="theme-color" content="#1a1612">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-
-<title>Film Lab — Karanlık Oda Asistanı</title>
+<title>Film Lab — Karanlık Oda</title>
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════
@@ -1705,10 +1707,14 @@ stripEl.innerHTML = sh + sh;
 onTempChange();
 calcChem();
 
-// ── SERVICE WORKER ──
+// ── SERVICE WORKER — GitHub Pages path düzeltmesi ──
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    // GitHub Pages'de repo adı path'e dahil olur: /filmlab/sw.js
+    const swPath = location.pathname.replace(/\/[^/]*$/, '/sw.js');
+    navigator.serviceWorker.register(swPath)
+      .then(reg => console.log('SW kayıtlı:', reg.scope))
+      .catch(err => console.log('SW hatası:', err));
   });
 }
 </script>
